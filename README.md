@@ -39,10 +39,10 @@ Driver Version muestra la version de Nvidia que esta instalada en el entorno de 
 Collab solamente mostrara la opcion de usar una CPU local si esta disponible, pero directamente usa una GPU de sus propios servidores, por lo que la GPU estaria en otro lugar. Imaginemos que tenemos un carro, este queda varado en tu casa y necesitas llevarlo al taller, tu tienes otro carro, entonces puedes decidir llevarlo arrastrado con tu otro carro usando una cuerda, o llamar un servicio de gruas para que lleve tu carro.
 3. `torch.cuda.is_available()` retorna `True` o `False`. ¿Qué condiciones deben cumplirse para que retorne `True`? Listen al menos tres requisitos.
 Este retorna True, para que este retorne TRUE necesitamos tener una GPU NVIDIA que tenga compatibilidad con CUDA, tener instalados los drivers de CUDA y tener CUDA Toolkit compatible.
+
 **Pantallazos:**
 
 ![GPU Disponible](img/gpu_model.png)
-**Pantallazos:**
 
 ![nvidia-smi](img/gpu_v.png)
 ---
@@ -56,9 +56,17 @@ Este retorna True, para que este retorne TRUE necesitamos tener una GPU NVIDIA q
 1. En el tutorial anterior usaron `cudaMemcpy` para mover datos entre CPU y GPU. En PyTorch eso se hace con `.to('cuda')`. ¿Qué ventaja le ven a la forma de PyTorch? ¿Qué se pierde al abstraerlo tanto?
 Pues podemos ver que al usar cudaMemcpy(destino, recepcion, tipo de dato, operacion), es una estructura mucho mas larga, en donde solo con .to('cuda') tenemos una estructura mas simplificada y facil de recordar, al igual que el manejo de memoria es mucho mas simplificado, dentro de Pytorch podemos ver que tenemos mucho menos control interno de la memopria gracias a su simplicidad de su estructura, mientras que en CUDA tenemos una estructura mucho mas especifica donde podemos encontrar opciones mas avanzadas.
 2. Diagramen en Excalidraw el flujo de un tensor desde que se crea en CPU hasta que se opera en GPU y el resultado vuelve a CPU. Etiqueten cada flecha con la operación de PyTorch correspondiente.
+
+![Diagram1](img/diagram.png)
+
 3. ¿Por qué es una buena práctica usar la variable `device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')` en lugar de escribir `'cuda'` directamente en el código?
 Porque este hace el codigo mucho mas seguro que y portatil, ya que verifica automaticamente que el dispositivo tenga una GPU Nvidia y que tenga CUDA disponible.
 
+**Pantallazos:**
+
+![Celda 3](img/celda3.png)
+
+![Celda 4](img/celda4.png)
 ---
 
 ## 3. Preparar los Datos: Dataset MNIST
@@ -77,6 +85,13 @@ No se pasan todas las imágenes de una sola vez a la GPU porque la memoria de la
 
 3. Cada imagen tiene forma `[1, 28, 28]`. Diagramen en Excalidraw qué representa cada dimensión y cómo luce ese tensor visualmente.
 
+![Diagram2](img/diagram2.png)
+
+**Pantallazos:**
+
+![10 Dig](img/img10.png)
+
+![Celda 6](img/celda6.png)
 ---
 
 ## 4. Construir la Red Neuronal
@@ -86,6 +101,11 @@ No se pasan todas las imágenes de una sola vez a la GPU porque la memoria de la
 
 ### Preguntas
 1. Diagramen en Excalidraw la arquitectura completa de la red: entrada → capa 1 → capa 2 → salida. Indiquen el número de neuronas en cada capa y qué función de activación se usa entre ellas.
+
+**Pantallazos:**
+
+![Diagrama 3](img/diagram3.png)
+
 2. ¿Por qué la capa de entrada tiene exactamente 784 neuronas y la de salida exactamente 10? ¿Qué pasaría si pusieran 11 neuronas en la salida?
 La capa de entrada tiene exactamente **784 neuronas** porque cada imagen de MNIST mide **28 x 28 píxeles**. Al aplanar la imagen, la matriz de 28 filas por 28 columnas se convierte en un vector de:
 
@@ -115,6 +135,10 @@ Cada una de esas capas tiene matrices de pesos y vectores de sesgos. Esos valore
 Es importante mover el modelo a la GPU porque las imágenes también se envían a la GPU con `.to(device)`. Si los datos están en GPU pero los pesos del modelo están en CPU, PyTorch no puede hacer las operaciones entre ellos y genera un error de dispositivos.
 
 Una analogía con CUDA en C sería la siguiente: en CUDA manual, primero se reserva memoria en la GPU con `cudaMalloc`, luego se copian los datos desde la CPU hacia la GPU con `cudaMemcpy`. En PyTorch, `modelo.to(device)` hace algo parecido para los pesos del modelo: coloca las matrices de pesos y sesgos en la memoria de la GPU para que las operaciones de entrenamiento se ejecuten allí.
+
+**Pantallazos:**
+
+![Arquitectura](img/arqui.png)
 ---
 
 ## 5. Entrenar el Modelo: CPU vs GPU
@@ -207,6 +231,14 @@ En CUDA, los cálculos se distribuyen en muchos hilos organizados en bloques. Ca
 
 La CPU tiene menos núcleos y está diseñada para tareas más generales y secuenciales. En cambio, la GPU tiene muchos núcleos más simples y está diseñada para ejecutar miles de operaciones parecidas en paralelo. Por eso, para entrenar redes neuronales, la GPU suele ser más rápida que la CPU.
 
+**Pantallazos:**
+
+![Entrenamiento CPU](img/entrecpu.png)
+
+![Entrenamiento GPU](img/entregpu.png)
+
+![Comparacion](img/comp.png)
+
 ### Análisis de la Curva de Aprendizaje
 
 Antes de responder, observen su gráfica generada y usen esta escala para interpretar el Loss:
@@ -234,6 +266,13 @@ El riesgo de entrenar demasiado es el **sobreajuste**. Esto ocurre cuando el mod
 ## 6. Evaluar y Visualizar Resultados
 * Calcular la precisión del modelo sobre los datos de prueba que nunca vio durante el entrenamiento.
 * Visualizar predicciones reales con indicadores de acierto (verde) y error (rojo).
+
+**Pantallazos:**
+
+![Probabilidades](img/probabilidades.png)
+
+![Prediccion real](img/prereal.png)
+
 
 ### Preguntas
 1. ¿Por qué la precisión se mide sobre datos que el modelo nunca vio durante el entrenamiento y no sobre los mismos datos con los que aprendió?
@@ -367,6 +406,9 @@ Esto muestra una limitación importante del modelo: fue entrenado solo con imág
 
 4. Tomar captura, de almenos una predicción que se haya hecho correctamente.
 
+**Pantallazos:**
+
+![Prediccion](img/prediccion.png)
 
 Va justo después de la celda que compara CPU vs GPU. El enunciado:
 
@@ -425,5 +467,21 @@ El bloque de código lo reemplazas con la función completa que ya tenemos. ¿Lo
 
 ### Preguntas
 1. Ahora que completaron todo el taller, ¿en qué se parece PyTorch a programar en CUDA directamente y en qué se diferencia? ¿Cuándo usarían uno y cuándo el otro?
+PyTorch se parece a programar en CUDA directamente porque en ambos casos se aprovecha la GPU para ejecutar cálculos en paralelo. En los dos enfoques existe el mismo principio: los datos deben estar en la memoria de la GPU para que la GPU pueda operar sobre ellos. Por eso, en CUDA se usan funciones como `cudaMalloc` y `cudaMemcpy`, mientras que en PyTorch usamos instrucciones como `.to('cuda')` o `.to(device)`.
+
+También se parecen en que ambos permiten acelerar tareas que tienen muchas operaciones repetidas, como multiplicaciones de matrices, procesamiento de imágenes o entrenamiento de redes neuronales.
+
+La diferencia principal es el nivel de abstracción. En CUDA directo, el programador controla detalles de bajo nivel, como la reserva de memoria, la copia de datos entre CPU y GPU, la creación de kernels, los hilos y los bloques. En PyTorch, muchas de esas operaciones se hacen de forma automática. Por ejemplo, al mover un tensor a la GPU y aplicar una operación matemática, PyTorch se encarga internamente de usar CUDA sin que tengamos que escribir manualmente los kernels.
+
+Usaríamos **PyTorch** cuando el objetivo sea construir, entrenar y evaluar modelos de inteligencia artificial o redes neuronales de forma rápida y clara. Es más práctico para experimentar con modelos, datasets, funciones de pérdida y optimizadores.
+
+Usaríamos **CUDA directamente** cuando se necesite máximo control sobre el hardware, optimizar un algoritmo específico o programar operaciones paralelas personalizadas que no estén disponibles directamente en librerías como PyTorch. CUDA permite controlar mejor cómo se distribuye el trabajo entre hilos y bloques, pero requiere más detalle y más cuidado.
+
 2. Diagramen en Excalidraw el flujo completo del taller: desde la activación de la GPU hasta la predicción final. Úsenlo como resumen visual de todo lo que hicieron.
+
+**Pantallazos:**
+
+![Diagrama 4](img/diagram4.png)
+
 3. Si tuvieran que explicarle este taller a alguien que nunca ha programado, ¿cómo describirían en una sola analogía lo que hace una red neuronal entrenándose en una GPU?
+Una red neuronal entrenándose en una GPU es como un grupo enorme de estudiantes corrigiendo miles de ejercicios al mismo tiempo. Primero, la red intenta adivinar qué número hay en una imagen. Luego compara su respuesta con la respuesta correcta y mide qué tanto se equivocó. Después ajusta su forma de decidir para equivocarse menos la próxima vez.
