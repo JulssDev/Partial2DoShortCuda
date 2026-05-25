@@ -89,9 +89,9 @@ No se pasan todas las imágenes de una sola vez a la GPU porque la memoria de la
 
 **Pantallazos:**
 
-![10 Dig](img/img10.jpeg)
+![10 Dig](img/img10.png)
 
-![Celda 6](img/celda6.jpeg)
+![Celda 6](img/celda6.png)
 ---
 
 ## 4. Construir la Red Neuronal
